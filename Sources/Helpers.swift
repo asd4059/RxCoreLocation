@@ -90,13 +90,3 @@ func clRegionErrorEvent(_ args: [Any]) throws -> CLRegionErrorEvent {
     let error = try castOrThrow(Error.self, args[2])
     return (manager, region, error)
 }
-
-extension ObservableType {
-    func map<R>(to value: R) -> Observable<R> {
-        return map {_ in value}
-    }
-    
-    func unwrap<T>() -> Observable<T> where Element == Optional<T> {
-        return self.filter { $0 != nil }.map { $0! }
-    }
-}

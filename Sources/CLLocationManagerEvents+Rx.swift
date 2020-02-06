@@ -15,37 +15,32 @@ import CoreLocation
 extension Reactive where Base: CLLocationManager {
     /// Reactive Observable for `activityType`
     public var activityType: Observable<CLActivityType?> {
-        return self.observe(CLActivityType.self, .activityType)
+        self.observe(CLActivityType.self, .activityType)
     }
     /// Reactive Observable for `distanceFilter`
     public var distanceFilter: Observable<CLLocationDistance> {
-        return self.observe(CLLocationDistance.self, .distanceFilter)
-            .map { $0 }
-            .unwrap()
+        self.observe(CLLocationDistance.self, .distanceFilter)
+            .compactMap { $0 }
     }
     /// Reactive Observable for `desiredAccuracy`
     public var desiredAccuracy: Observable<CLLocationAccuracy> {
-        return self.observe(CLLocationAccuracy.self, .desiredAccuracy)
-            .map { $0 }
-            .unwrap()
+        self.observe(CLLocationAccuracy.self, .desiredAccuracy)
+            .compactMap { $0 }
     }
     /// Reactive Observable for `pausesLocationUpdatesAutomatically`
     public var pausesLocationUpdatesAutomatically: Observable<Bool> {
-        return self.observe(Bool.self, .pausesLocationUpdatesAutomatically)
-            .map { $0 }
-            .unwrap()
+        self.observe(Bool.self, .pausesLocationUpdatesAutomatically)
+            .compactMap { $0 }
     }
     /// Reactive Observable for `allowsBackgroundLocationUpdates`
     public var allowsBackgroundLocationUpdates: Observable<Bool> {
-        return self.observe(Bool.self, .allowsBackgroundLocationUpdates)
-            .map { $0 }
-            .unwrap()
+        self.observe(Bool.self, .allowsBackgroundLocationUpdates)
+            .compactMap { $0 }
     }
     /// Reactive Observable for `showsBackgroundLocationIndicator`
     public var showsBackgroundLocationIndicator: Observable<Bool> {
-        return self.observe(Bool.self, .showsBackgroundLocationIndicator)
-            .map { $0 }
-            .unwrap()
+        self.observe(Bool.self, .showsBackgroundLocationIndicator)
+            .compactMap { $0 }
     }
     /// Reactive Observable for `location`
     public var location: Observable<CLLocation?> {
@@ -55,12 +50,12 @@ extension Reactive where Base: CLLocationManager {
     }
     /// Reactive Observable for CLPlacemark
     public var placemark: Observable<CLPlacemark> {
-        return location.unwrap().flatMap(placemark(with:))
+        location.compactMap { $0 }.flatMap(placemark(with:))
     }
     /// Private reactive wrapper for `CLGeocoder`.`reverseGeocodeLocation`
     /// used to search for placemark
     private func placemark(with location: CLLocation) -> Observable<CLPlacemark> {
-        return Observable.create { observer in
+        Observable.create { observer in
             let geocoder = CLGeocoder()
             geocoder.reverseGeocodeLocation(location) { placemarks, _ in
                 observer.onNext(placemarks?.first)
@@ -68,73 +63,69 @@ extension Reactive where Base: CLLocationManager {
             return Disposables.create {
                 observer.onCompleted()
             }
-        }.unwrap()
+        }.compactMap { $0 }
     }
     /// Reactive Observable for `headingFilter`
     public var headingFilter: Observable<CLLocationDegrees> {
-        return self.observe(CLLocationDegrees.self, .headingFilter)
-            .map { $0 }
-            .unwrap()
+        self.observe(CLLocationDegrees.self, .headingFilter)
+            .compactMap { $0 }
     }
     /// Reactive Observable for `headingOrientation`
     public var headingOrientation: Observable<CLDeviceOrientation?> {
-        return self.observe(CLDeviceOrientation.self, .headingOrientation)
+        self.observe(CLDeviceOrientation.self, .headingOrientation)
     }
      #if os(iOS) || os(macOS)
     /// Reactive Observable for `heading`
     public var heading: Observable<CLHeading?> {
-        return self.observe(CLHeading.self, .heading)
+        self.observe(CLHeading.self, .heading)
     }
     #endif
     /// Reactive Observable for `maximumRegionMonitoringDistance`
     public var maximumRegionMonitoringDistance: Observable<CLLocationDistance> {
-        return self.observe(CLLocationDistance.self, .maximumRegionMonitoringDistance)
-            .map { $0 }
-            .unwrap()
+        self.observe(CLLocationDistance.self, .maximumRegionMonitoringDistance)
+            .compactMap { $0 }
     }
     /// Reactive Observable for `monitoredRegions`
     public var monitoredRegions: Observable<Set<CLRegion>> {
-        return self.observe(Set<CLRegion>.self, .monitoredRegions)
-            .map { $0 }
-            .unwrap()
+        self.observe(Set<CLRegion>.self, .monitoredRegions)
+            .compactMap { $0 }
     }
     /// Reactive Observable for `rangedRegions`
     public var rangedRegions: Observable<Set<CLRegion>> {
-        return self.observe(Set<CLRegion>.self, .rangedRegions)
-            .map { $0 }
-            .unwrap()
+        self.observe(Set<CLRegion>.self, .rangedRegions)
+            .compactMap { $0 }
     }
     
     /// Reactive Observable for `locationServicesEnabled`
     public var isEnabled: Observable<Bool> {
-        return CLLocationManager.__isEnabled.share()
+        CLLocationManager.__isEnabled.share()
     }
     
     /// Reactive Observable for `authorizationStatus`
     public var status: Observable<CLAuthorizationStatus> {
-        return CLLocationManager.__status.share()
+        CLLocationManager.__status.share()
     }
     
      #if os(iOS) || os(macOS)
     /// Reactive Observable fo `deferredLocationUpdatesAvailable`
     public var isDeferred: Observable<Bool> {
-        return CLLocationManager.__isDeferred.share()
+        CLLocationManager.__isDeferred.share()
     }
     
     /// Reactive Observable fo `significantLocationChangeMonitoringAvailable`
     public var hasChanges: Observable<Bool> {
-        return CLLocationManager.__hasChanges.share()
+        CLLocationManager.__hasChanges.share()
     }
     
     /// Reactive Observable fo `headingAvailable`
     public var isHeadingAvailable: Observable<Bool> {
-        return CLLocationManager.__isHeadingAvailable.share()
+        CLLocationManager.__isHeadingAvailable.share()
     }
     #endif
     /// Reactive Observable fo `isRangingAvailable`
     #if os(iOS)
     public var isRangingAvailable: Observable<Bool> {
-        return CLLocationManager.__isRangingAvailable.share()
+        CLLocationManager.__isRangingAvailable.share()
     }
     #endif
 }
@@ -142,7 +133,7 @@ extension Reactive where Base: CLLocationManager {
 extension CLLocationManager {
     /// Reactive Observable for `locationServicesEnabled`
     internal static var __isEnabled: Observable<Bool> {
-        return Observable.create { observer in
+        Observable.create { observer in
             observer.on(.next(CLLocationManager.locationServicesEnabled()))
             return Disposables.create {
                 observer.onCompleted()
@@ -151,7 +142,7 @@ extension CLLocationManager {
     }
     /// Reactive Observable for `authorizationStatus`
     internal static var __status: Observable<CLAuthorizationStatus> {
-        return Observable.create { observer in
+        Observable.create { observer in
             observer.on(.next(CLLocationManager.authorizationStatus()))
             return Disposables.create {
                 observer.onCompleted()
@@ -161,7 +152,7 @@ extension CLLocationManager {
     /// Reactive Observable fo `deferredLocationUpdatesAvailable`
      #if os(iOS) || os(macOS)
     internal static var __isDeferred: Observable<Bool> {
-        return Observable.create { observer in
+        Observable.create { observer in
             observer.on(.next(CLLocationManager.deferredLocationUpdatesAvailable()))
             return Disposables.create {
                 observer.onCompleted()
@@ -170,7 +161,7 @@ extension CLLocationManager {
     }
     /// Reactive Observable fo `significantLocationChangeMonitoringAvailable`
     internal static var __hasChanges: Observable<Bool> {
-        return Observable.create { observer in
+        Observable.create { observer in
             observer.on(.next(CLLocationManager.significantLocationChangeMonitoringAvailable()))
             return Disposables.create {
                 observer.onCompleted()
@@ -179,7 +170,7 @@ extension CLLocationManager {
     }
     /// Reactive Observable fo `headingAvailable`
     internal static var __isHeadingAvailable: Observable<Bool> {
-        return Observable.create { observer in
+        Observable.create { observer in
             observer.on(.next(CLLocationManager.headingAvailable()))
             return Disposables.create {
                 observer.onCompleted()
@@ -191,7 +182,7 @@ extension CLLocationManager {
     /// Reactive Observable fo `isRangingAvailable`
     #if os(iOS)
     internal static var __isRangingAvailable: Observable<Bool> {
-        return Observable.create { observer in
+        Observable.create { observer in
             observer.on(.next(CLLocationManager.isRangingAvailable()))
             return Disposables.create {
                 observer.onCompleted()

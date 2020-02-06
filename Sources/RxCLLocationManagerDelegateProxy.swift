@@ -38,7 +38,7 @@ open class RxCLLocationManagerDelegateProxy: RxCLLocationManagerDelegate, Delega
     
     /// Gets the current `CLLocationManagerDelegate` on `CLLocationManager`
     open class func currentDelegate(for object: ParentObject) -> CLLocationManagerDelegate? {
-        return object.delegate
+        object.delegate
     }
     
     /// Set the CLLocationManagerDelegate for `CLLocationManager`
